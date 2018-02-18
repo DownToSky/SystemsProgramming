@@ -93,7 +93,7 @@ void delete_node(char* addr)
 void* mymalloc(size_t size, char* file, size_t line)
 {
 	if(size > TOTAL_MEMORY_SIZE - size_used)
-		reutrn NULL;
+		return NULL;
 	char* ptr  = find_free_node(memory, size);
 	if(ptr == NULL)
 		return NULL;
