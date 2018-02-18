@@ -11,7 +11,7 @@
 
 // struct representing a memory node in the memory chunk
 typedef struct{
-    bool is_occupid;
+    bool is_occupied;
     size_t size;
 }Node;
 
