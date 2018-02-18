@@ -14,7 +14,7 @@ void initialize()
 	for(pos; pos < TOTAL_MEMORY_SIZE; pos++)
 		memory[pos] = 0;
 	
-	Node* first_node = (Node*)memory;
+	Node* first_node = (Node*)(&memory[0]);
 	first_node -> size = TOTAL_MEMORY_SIZE - size_used;
 	first_node -> is_occupied = false;
 }
@@ -22,14 +22,15 @@ void initialize()
 void print_all_nodes()
 {
 	puts("The current statistics of dynamic memory usage:");
-	printf("Allocated:\t%d\n\
-	Left:\t\t%d\n\n", size_used, TOTAL_MEMORY_SIZE-size_used);
-	int i = 0;
-	char* ptr = memory;
+	printf("Allocated: %d\
+	Left: %d\
+    Nodes used: %d\n\n", size_used, TOTAL_MEMORY_SIZE-size_used,nodes_used);
+    int i = 0;
+	char* ptr = &memory[0];
 	for(i;i < TOTAL_MEMORY_SIZE; i++)
 	{
 		Node * node = (Node*)(ptr);
-		printf("Node number: %d\t\
+		//printf("Node number: %d\t\
 		Node Address: %p\n\
 		is occupied: %d\t\
 		Node size: %d\n\
@@ -92,9 +93,12 @@ void delete_node(char* addr)
 
 void* mymalloc(size_t size, char* file, size_t line)
 {
+    if (nodes_used == 0)
+        initialize();
 	if(size > TOTAL_MEMORY_SIZE - size_used)
 		return NULL;
-	char* ptr  = find_free_node(memory, size);
+	puts("DONE");
+    char* ptr  = find_free_node(&memory[0], size);
 	if(ptr == NULL)
 		return NULL;
 	ptr = allocate_node(ptr, size);
@@ -103,7 +107,7 @@ void* mymalloc(size_t size, char* file, size_t line)
 
 void myfree(void* addr, char* file, size_t line)
 {
-	char* ptr = memory;
+	char* ptr = &memory[0];
 	
 	int i = 0;
 	for(i; i<nodes_used; i++)
