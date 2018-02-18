@@ -22,4 +22,12 @@ static size_t size_left = 0;
 
 static int nodes_used = 0;
 
+void initialize();
 
+char* find_unoccupied_node(char* beginning, size_t size);
+
+char* allocate_node(char* unoccupied_node, size_t size);
+
+void delete_node(char* addr);
+
+void test();
