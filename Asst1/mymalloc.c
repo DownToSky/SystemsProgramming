@@ -33,7 +33,7 @@ void print_all_nodes()
 		Node Address: %p\n\
 		is occupied: %d\t\
 		Node size: %d\n\
-		___________________\n", i, itr, node->is_occupied, node->size);
+		___________________\n", i, ptr, node->is_occupied, node->size);
 		ptr += node -> size + sizeof(Node*) + 1;
 	}
 }
@@ -52,7 +52,7 @@ char* find_free_node(char* beginning, size_t size)
 			return ptr;
 		
 		// check next node in the next iteration
-		ptr += sizeof(Node*) + curr_node -> size + 1
+		ptr += sizeof(Node*) + curr_node -> size + 1;
 	}
 	return NULL;
 }
@@ -110,7 +110,7 @@ void myfree(void* addr, char* file, size_t line)
 	{
 		// if found the node representing the given address
 		Node* node = (Node*) addr;
-		char* metadata_pos = ptr + sizeof(Node*) + 1
+		char* metadata_pos = ptr + sizeof(Node*) + 1;
 		if (metadata_pos == addr)
 		{
 			node -> is_occupied = false;
