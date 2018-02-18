@@ -54,6 +54,7 @@ char* find_free_node(char* beginning, size_t size)
 		// check next node in the next iteration
 		ptr += sizeof(Node*) + curr_node -> size + 1
 	}
+	return NULL;
 }
 
 char* allocate_node(char* free_node, size_t size)
@@ -73,7 +74,7 @@ char* allocate_node(char* free_node, size_t size)
 
 void delete_node(char* addr)
 {
-	if(nodes_used == 0)
+	if(nodes_used == 1)
 		return;
 	
 	Node* curr_node = (Node*)addr;
@@ -89,6 +90,33 @@ void delete_node(char* addr)
 		}
 }
 
-void* mymalloc(size_t size, char* file, size_t line);
+void* mymalloc(size_t size, char* file, size_t line)
+{
+	if(size > TOTAL_MEMORY_SIZE - size_used)
+		reutrn NULL;
+	char* ptr  = find_free_node(memory, size);
+	if(ptr == NULL)
+		return NULL;
+	ptr = allocate_node(ptr, size);
+	return (void*) ptr;
+}
 
-void myfree(void* addr, char* file, size_t line);
+void myfree(void* addr, char* file, size_t line)
+{
+	char* ptr = memory;
+	
+	int i = 0;
+	for(i; i<nodes_used; i++)
+	{
+		// if found the node representing the given address
+		Node* node = (Node*) addr;
+		char* metadata_pos = ptr + sizeof(Node*) + 1
+		if (metadata_pos == addr)
+		{
+			node -> is_occupied = false;
+			delete_node(ptr);
+			break;
+		}
+		ptr += node->size + sizeof(Node*) + 1;
+	}
+}
