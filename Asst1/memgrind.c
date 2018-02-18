@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "mymalloc.h"
+#include <stdlib.h>
 #include <time.h>
 
 int main(int argc, const char* argv[])
