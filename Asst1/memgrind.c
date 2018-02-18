@@ -10,7 +10,7 @@ int main(int argc, const char* argv[])
 		arr[i] = malloc(1);		
 	}
 	
-	i=0
+	i=0;
 	for(; i<1000; i++){
 		free(arr[i]);
 	}
