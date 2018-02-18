@@ -15,5 +15,5 @@ int main(int argc, const char* argv[])
 	for(; i<1000; i++){
 		free(arr[i]);
 	}
-	reutrn 0;
+	return 0;
 }
