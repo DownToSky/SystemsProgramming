@@ -1,7 +1,7 @@
 #include "mymalloc.h"
 
 /*
- * memory needs to be initialized before it is used by malloc
+ * memory needs to be initialized first time it is used by malloc
  * a new initialized memory is a single node that marks
  * the entirty of the rest of the bloc as accesible
  */
