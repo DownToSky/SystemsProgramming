@@ -14,7 +14,7 @@ void initialize()
 	for(pos; pos < TOTAL_MEMORY_SIZE; pos++)
 		memory[pos] = 0;
 	
-	Node* first_node = (Node*)(&memory[0]);
+	Node* first_node = (Node*)(memory);
 	first_node -> size = TOTAL_MEMORY_SIZE - size_used;
 	first_node -> is_occupied = false;
 }
@@ -26,7 +26,7 @@ void print_all_nodes()
 	Left: %d\
     Nodes used: %d\n\n", size_used, TOTAL_MEMORY_SIZE-size_used,nodes_used);
     int i = 0;
-	char* ptr = &memory[0];
+	char* ptr = memory;
 	for(i;i < TOTAL_MEMORY_SIZE; i++)
 	{
 		Node * node = (Node*)(ptr);
@@ -46,7 +46,7 @@ char* find_free_node(char* beginning, size_t size)
 	// traverse through all nodes and find one that is
 	// not occupied and return it
 	int i =0;
-	for(i; i < nodes_used; i++)
+	for(; i < nodes_used; i++)
 	{
 		Node* curr_node = (Node*)ptr;
 		if (curr_node -> size >=size && curr_node -> is_occupied == false)
@@ -58,19 +58,31 @@ char* find_free_node(char* beginning, size_t size)
 	return NULL;
 }
 
-char* allocate_node(char* free_node, size_t size)
+char* allocate_node(char* open_position, size_t request_size)
 {
 	
-	Node* node = (Node*) free_node;
-	Node* new_node =  (Node*)(1 + free_node + sizeof(node) + size);
+	//store the size of the original block of memory
+	size_t old_size = ((MemNode*)(open_position))->mem_size;
 	
-	new_node -> size = node -> size - size - sizeof(Node*);
-	new_node -> is_occupied = false;
-	node ->is_occupied = true;
-	node -> size = size;
-	size_used += sizeof(Node*) + size;
-	nodes_used += 1;
-	return sizeof(node) + 1 + free_node;
+	//1. update the old memory size with the new request size	
+	//2. update the dirty to show that there is data now written to this position
+	((MemNode*)(open_position))->mem_size = request_size;
+	((MemNode*)(open_position))->dirty_bit = true;
+	
+	//Pointer to the malloced position the user requested
+	//The value that we are going to return.
+	char* write_pos = open_position + sizeof(MemNode*) + 1;
+
+	//create a new MemNode right after the data we are going to return to the user
+	//TODO: Check to see if we need to add this +1
+	char* new_mem_node = write_pos + request_size;
+	((MemNode*)(new_mem_node))->mem_size = old_size - request_size - sizeof(MemNode*);
+	((MemNode*)(new_mem_node))->dirty_bit = false;
+	
+	memory_count += request_size + sizeof(MemNode*);
+	mem_node_count += 1;
+
+	return write_pos;
 }
 
 void delete_node(char* addr)
@@ -85,7 +97,7 @@ void delete_node(char* addr)
 		next_node -> is_occupied == false &&
 		next_node -> size > 0)
 		{
-			size_used -= 1;
+			nodes_used -= 1;
 			curr_node -> size += sizeof(Node*) + next_node->size;
 			delete_node(addr);
 		}
@@ -93,12 +105,9 @@ void delete_node(char* addr)
 
 void* mymalloc(size_t size, char* file, size_t line)
 {
-    if (nodes_used == 0)
-        initialize();
 	if(size > TOTAL_MEMORY_SIZE - size_used)
 		return NULL;
-	puts("DONE");
-    char* ptr  = find_free_node(&memory[0], size);
+    char* ptr  = find_free_node(memory, size);
 	if(ptr == NULL)
 		return NULL;
 	ptr = allocate_node(ptr, size);
@@ -107,10 +116,10 @@ void* mymalloc(size_t size, char* file, size_t line)
 
 void myfree(void* addr, char* file, size_t line)
 {
-	char* ptr = &memory[0];
+	char* ptr = memory;
 	
 	int i = 0;
-	for(i; i<nodes_used; i++)
+	for(; i<nodes_used; i++)
 	{
 		// if found the node representing the given address
 		Node* node = (Node*) addr;
