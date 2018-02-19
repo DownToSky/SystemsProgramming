@@ -60,27 +60,16 @@ char* find_free_node(char* beginning, size_t size)
 
 char* allocate_node(char* open_position, size_t request_size)
 {
-	
-	//store the size of the original block of memory
-	size_t old_size = ((MemNode*)(open_position))->mem_size;
-	
-	//1. update the old memory size with the new request size	
-	//2. update the dirty to show that there is data now written to this position
-	((MemNode*)(open_position))->mem_size = request_size;
-	((MemNode*)(open_position))->dirty_bit = true;
-	
-	//Pointer to the malloced position the user requested
-	//The value that we are going to return.
-	char* write_pos = open_position + sizeof(MemNode*) + 1;
-
-	//create a new MemNode right after the data we are going to return to the user
-	//TODO: Check to see if we need to add this +1
+	size_t old_size = ((Node*)(open_position))->size;
+	((Node*)(open_position))->size = request_size;
+	((Node*)(open_position))->is_occupied = true;
+	char* write_pos = open_position + sizeof(Node*) + 1;
 	char* new_mem_node = write_pos + request_size;
-	((MemNode*)(new_mem_node))->mem_size = old_size - request_size - sizeof(MemNode*);
-	((MemNode*)(new_mem_node))->dirty_bit = false;
+	((Node*)(new_mem_node))->size = old_size - request_size - sizeof(Node*);
+	((Node*)(new_mem_node))->is_occupied = false;
 	
-	memory_count += request_size + sizeof(MemNode*);
-	mem_node_count += 1;
+	size_used += request_size + sizeof(Node*);
+	nodes_used += 1;
 
 	return write_pos;
 }
